@@ -122,3 +122,43 @@ test('Navigate through the left panel whit Maintenance', async({page}) => {
       }
   }
 })
+
+test('Check all the qualification links', async({ page}) => {
+
+    const expectedPages = [
+
+      {
+        menu: 'Skills',
+        url: '/web/index.php/admin/viewSkills'
+      },
+      {
+        menu: 'Education',
+        url: '/web/index.php/admin/viewEducation'
+      },
+      {
+        menu: 'Licenses',
+        url: '/web/index.php/admin/viewLicenses'
+      }
+    ]
+
+     await page.goto('https://opensource-demo.orangehrmlive.com/')
+     await page.getByRole('textbox', {name: 'Username'}).fill('Admin')
+     await page.getByRole('textbox', {name: 'Password'}).fill('admin123')
+     await page.getByRole('button', {name: 'Login'}).click()
+
+     await expect(page.getByRole('link', {name: 'Admin'})).toBeVisible()
+
+     await page.getByRole('link', {name: 'Admin'}).click()
+
+     await page.getByRole('navigation', {name: 'Topbar menu'}).getByText('Qualifications').click()
+
+     const qualificationOptions = page.getByRole('menu').locator('li')
+
+     for(let expetedPage of expectedPages){
+      const menuOption = qualificationOptions.filter({hasText: expetedPage.menu})
+      await menuOption.click()
+      await expect(page).toHaveURL(new RegExp(expetedPage.url))
+
+      await page.getByRole('navigation', {name: 'Topbar menu'}).getByText('Qualifications').click()
+     }
+})
